@@ -267,6 +267,7 @@ class GraphView @JvmOverloads constructor(
         dialog.show()
     }
 
+
     // Afficher le menu contextuel pour une connexion
     private fun showEdgeContextMenu(edge: Edge) {
         val context = this.context
