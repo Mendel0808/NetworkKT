@@ -8,4 +8,21 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="custom_color">#cfc9c8</color>
+
+    <!-- Nouvelles couleurs ajoutées -->
+    <color name="red">#FF0000</color>
+    <color name="green">#00FF00</color>
+    <color name="blue">#0000FF</color>
+    <color name="orange">#FFA500</color>
+    <color name="cyan">#00FFFF</color>
+    <color name="magenta">#FF00FF</color>
+
+    <!-- Variantes supplémentaires utiles -->
+    <color name="dark_red">#8B0000</color>
+    <color name="dark_green">#006400</color>
+    <color name="dark_blue">#00008B</color>
+    <color name="light_red">#FFCDD2</color>
+    <color name="light_green">#C8E6C9</color>
+    <color name="light_blue">#BBDEFB</color>
+
 </resources>

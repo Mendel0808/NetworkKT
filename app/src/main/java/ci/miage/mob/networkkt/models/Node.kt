@@ -11,23 +11,20 @@ data class Node(
     var color: Int = Color.BLACK,
     var labelColor: Int = Color.BLUE,
     val radius: Float = 60f,
-    val id: String = UUID.randomUUID().toString() // Identifiant unique
+    val id: String = UUID.randomUUID().toString() // Identifiant unique des noeuds
 ) : Serializable {
 
-    // Déplacer le nœud à de nouvelles coordonnées
     fun move(newX: Float, newY: Float) {
         x = newX
         y = newY
     }
 
-    // Vérifier si un point (px, py) est à l'intérieur du nœud
     fun isInside(px: Float, py: Float): Boolean {
         val dx = x - px
         val dy = y - py
         return (dx * dx + dy * dy) <= (radius * radius)
     }
 
-    // Calculer la position de l'étiquette
     fun getLabelPosition(): Pair<Float, Float> {
         val labelOffset = radius + 7 // Décalage fixe entre le bord du cercle et l'étiquette
         val labelX = x + labelOffset

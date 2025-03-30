@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <!-- Barre d'outils (Toolbar) pour afficher le menu -->
+    <!-- Notre en-tête -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -17,10 +17,11 @@
         app:title="Network Yann / Amy"
         app:titleTextColor="@android:color/white" />
 
-    <!-- GraphView -->
+    <!-- Notre GraphView -->
     <ci.miage.mob.networkkt.GraphView
         android:id="@+id/graphView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:paddingTop="?attr/actionBarSize" /> <!-- Ajout de paddingTop -->
 </LinearLayout>

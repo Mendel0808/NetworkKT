@@ -1,11 +1,15 @@
 package ci.miage.mob.networkkt.models
-
+//1
 import android.content.Context
+import android.graphics.Path
+import android.graphics.PathMeasure
 import android.util.Log
 import com.google.gson.Gson
 import java.io.File
 import java.io.IOException
 import java.io.Serializable
+import kotlin.math.*
+
 
 class Graph : Serializable {
     val nodes = mutableSetOf<Node>()
@@ -47,7 +51,6 @@ class Graph : Serializable {
         return true
     }
 
-    // Supprimer une arête
     fun removeEdge(edge: Edge) {
         val removed = edges.remove(edge)
         if (removed) {
@@ -60,26 +63,6 @@ class Graph : Serializable {
     // Trouver un nœud à une position donnée
     fun findNodeAt(x: Float, y: Float): Node? {
         return nodes.find { it.isInside(x, y) }
-    }
-
-    fun findEdgeAt(x: Float, y: Float): Edge? {
-        return edges.find { edge ->
-            // Calculer la position de l'étiquette (milieu de la ligne)
-            val midX = (edge.start.x + edge.end.x) / 2
-            val midY = (edge.start.y + edge.end.y) / 2
-
-            // Calculer la distance entre le point de toucher et l'étiquette
-            val distance = Math.sqrt(
-                Math.pow((x - midX).toDouble(), 2.0) + Math.pow((y - midY).toDouble(), 2.0)
-            )
-
-            // Tolérance pour cliquer sur l'étiquette (ajustez la valeur si nécessaire)
-            distance <= 50 // 50 pixels de tolérance
-        }
-    }
-
-    fun hasEdgeBetween(start: Node, end: Node): Boolean {
-        return edges.any { (it.start == start && it.end == end) || (it.start == end && it.end == start) }
     }
 
     // Sauvegarder le graphe dans un fichier
@@ -153,23 +136,41 @@ class Graph : Serializable {
         }
     }
 
-    // Supprimer un fichier sauvegardé
-    fun deleteSavedNetwork(context: Context, filename: String): Boolean {
-        val folder = File(context.filesDir, "saved_networks")
-        val file = File(folder, filename)
-        return if (file.exists()) {
-            file.delete()
-        } else {
-            false
+
+    fun findEdgeAt(x: Float, y: Float): Edge? {
+        return edges.find { edge ->
+            val (labelX, labelY) = edge.getLabelPosition()
+            val isNearLabel = edge.label != null &&
+                    sqrt((x - labelX).pow(2) + (y - labelY).pow(2)) <= 50f
+
+            isNearLabel || isPointNearEdge(x, y, edge)
         }
     }
 
-    // Mettre à jour les arêtes connectées à un nœud
-    fun updateEdgesForNode(node: Node) {
-        for (edge in edges) {
-            if (edge.start == node || edge.end == node) {
-                // Les arêtes sont déjà liées aux nœuds, donc elles se mettront à jour automatiquement
-            }
+    private fun isPointNearEdge(px: Float, py: Float, edge: Edge): Boolean {
+        return if (edge.isCurved) isPointNearCurve(px, py, edge)
+        else isPointNearLine(px, py, edge.start.x, edge.start.y, edge.end.x, edge.end.y, 20f)
+    }
+
+    private fun isPointNearCurve(px: Float, py: Float, edge: Edge): Boolean {
+        val path = Path().apply {
+            moveTo(edge.start.x, edge.start.y)
+            quadTo(edge.controlX, edge.controlY, edge.end.x, edge.end.y)
         }
+        val measure = PathMeasure(path, false)
+        val point = FloatArray(2)
+        for (i in 0..10) {
+            measure.getPosTan(i * measure.length / 10, point, null)
+            if (sqrt((px - point[0]).pow(2) + (py - point[1]).pow(2)) <= 20f) return true
+        }
+        return false
+    }
+
+
+    private fun isPointNearLine(px: Float, py: Float, x1: Float, y1: Float,
+                                x2: Float, y2: Float, tolerance: Float): Boolean {
+        val lineLength = sqrt((x2 - x1).pow(2) + (y2 - y1).pow(2))
+        val distance = abs((y2 - y1) * px - (x2 - x1) * py + x2 * y1 - y2 * x1) / lineLength
+        return distance <= tolerance
     }
 }

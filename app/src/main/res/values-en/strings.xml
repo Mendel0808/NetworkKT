@@ -1,44 +1,56 @@
 <resources>
     <string name="app_name">Network Yann / Amy</string>
-    <string name="menu_reset">Reset</string>
-    <string name="menu_save">Save</string>
-    <string name="menu_load">Load</string>
-    <string name="menu_add_object">Add Object</string>
-    <string name="menu_add_connection">Add Connection</string>
-    <string name="menu_edit">Edit</string>
-    <string name="dialog_save_title">Save Network</string>
-    <string name="dialog_save_message">Enter a filename:</string>
-    <string name="dialog_save_button">Save</string>
-    <string name="dialog_cancel_button">Cancel</string>
-    <string name="dialog_load_title">Load Network</string>
-    <string name="dialog_add_object_title">Add Object</string>
-    <string name="dialog_add_object_message">Enter the object label:</string>
-    <string name="dialog_add_connection_title">Add Connection</string>
-    <string name="dialog_add_connection_message">Enter the connection label:</string>
-    <string name="dialog_edit_label_title">Edit Label</string>
-    <string name="dialog_edit_label_message">Enter the new label:</string>
-    <string name="dialog_color_picker_title">Choose a Color</string>
-    <string name="dialog_edge_thickness_title">Change Thickness</string>
-    <string name="dialog_edge_thickness_message">Enter the new thickness:</string>
-    <string name="toast_graph_reset">Graph reset</string>
-    <string name="toast_add_object_mode">Add Object mode enabled</string>
-    <string name="toast_add_connection_mode">Add Connection mode enabled</string>
-    <string name="toast_edit_mode">Edit mode enabled</string>
+    <string name="menu_reset">Reset network</string>
+    <string name="menu_save">Save network</string>
+    <string name="menu_load">Load network</string>
+    <string name="menu_add_object">Add object</string>
+    <string name="menu_add_connection">Add connection</string>
+    <string name="menu_edit">Edit objects/connections</string>
+    <string name="menu_more">More</string>
+    <string name="toast_graphs_reset">Graph reset</string>
+    <string name="toast_add_object_mode">Add object mode activated</string>
+    <string name="toast_add_connection_mode">Add connection mode activated</string>
+    <string name="toast_edit_mode">Edit mode activated</string>
     <string name="toast_network_saved">Network saved: %s</string>
     <string name="toast_network_loaded">Network loaded: %s</string>
     <string name="toast_error_saving">Error saving</string>
     <string name="toast_error_loading">Error loading</string>
-    <string name="toast_invalid_filename">Filename cannot be empty</string>
-    <string name="toast_no_saved_networks">No saved networks found</string>
-    <string name="node_options_title">Options for %s</string>
-    <string name="node_options_delete">Delete</string>
-    <string name="node_options_edit_label">Edit Label</string>
-    <string name="node_options_change_color">Change Color</string>
-    <string name="edge_options_title">Options for Connection</string>
-    <string name="edge_options_delete">Delete</string>
-    <string name="edge_options_edit_label">Edit Label</string>
-    <string name="edge_options_change_color">Change Color</string>
-    <string name="edge_options_change_thickness">Change Thickness</string>
+    <string name="toast_invalid_filename">Invalid filename</string>
+    <string name="toast_node_deleted">Node deleted</string>
+    <string name="toast_edge_deleted">Edge deleted</string>
+    <string name="toast_connection_exists">Connection already exists</string>
+    <string name="toast_curve_updated">Curvature updated</string>
+
+    <!-- Nouvelles chaînes ajoutées -->
+    <string name="toast_no_networks_saved">No saved networks</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Dialogues -->
+    <string name="dialog_add_object_title">Add object</string>
+    <string name="dialog_add_object_hint">Object name</string>
+    <string name="dialog_add_connection_title">Create connection</string>
+    <string name="dialog_add_connection_hint">Connection name</string>
+    <string name="dialog_node_context_title">Node options: %s</string>
+    <string name="dialog_node_delete">Delete</string>
+    <string name="dialog_node_rename">Rename</string>
+    <string name="dialog_node_change_color">Change color</string>
+    <string name="dialog_edge_context_title">Connection options</string>
+    <string name="dialog_edge_delete">Delete</string>
+    <string name="dialog_edge_rename">Rename</string>
+    <string name="dialog_edge_change_color">Change color</string>
+    <string name="dialog_edge_change_thickness">Change thickness</string>
+    <string name="dialog_rename_node_title">Rename node</string>
+    <string name="dialog_choose_color_title">Choose a color</string>
+    <string name="dialog_edge_thickness_title">Connection thickness</string>
+    <string name="dialog_edge_rename_title">Rename connection</string>
+
+    <!-- Boutons génériques -->
+    <string name="button_add">Add</string>
+    <string name="button_create">Create</string>
+    <string name="button_validate">Validate</string>
+    <string name="button_cancel">Cancel</string>
+
+    <!-- Noms des couleurs -->
     <string name="color_red">Red</string>
     <string name="color_green">Green</string>
     <string name="color_blue">Blue</string>
