@@ -23,9 +23,6 @@ class MainActivity : AppCompatActivity() {
 
         // Initialisation du graphe
         graph = Graph()
-        graph.addNode(Node(200f, 200f, "A"))
-        graph.addNode(Node(400f, 400f, "B"))
-
         graphView = findViewById(R.id.graphView)
         graphView.setGraph(graph)
     }

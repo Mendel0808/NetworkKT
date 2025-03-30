@@ -88,10 +88,15 @@ class GraphView @JvmOverloads constructor(
         }
         val path = Path().apply {
             moveTo(edge.start.x, edge.start.y)
-            if (edge.isCurved) quadTo(edge.controlX, edge.controlY, edge.end.x, edge.end.y)
-            else lineTo(edge.end.x, edge.end.y)
+            if (edge.isCurved) {
+                quadTo(edge.controlX, edge.controlY, edge.end.x, edge.end.y)
+            } else {
+                lineTo(edge.end.x, edge.end.y)
+            }
         }
         canvas.drawPath(path, paint)
+
+        // Dessiner l'étiquette de la connexion
         edge.label?.let { label ->
             val (x, y) = edge.getLabelPosition()
             canvas.drawText(label, x, y, Paint().apply {
@@ -180,13 +185,16 @@ class GraphView @JvmOverloads constructor(
                 if (!isDragging) showEdgeContextMenu(selectedEdge!!)
             }
         } else {
-            isBendingEdge = selectedEdge!!.isCurved
+            // Activer le mode de courbure
+            isBendingEdge = true
         }
     }
 
     private fun handleTouchMove(x: Float, y: Float) {
         when {
             isBendingEdge && selectedEdge != null -> {
+                // Ajuster la courbure directement avec le doigt
+                selectedEdge!!.adjustCurvature(x, y)
                 invalidate()
             }
             isDrawingConnection -> {
@@ -198,14 +206,18 @@ class GraphView @JvmOverloads constructor(
                 isDragging = true
                 cancelPendingActions()
                 selectedNode!!.move(x, y)
+
+                // Mettre à jour les points de contrôle des connexions liées au nœud déplacé
                 graph.edges.forEach { edge ->
                     if (edge.start == selectedNode || edge.end == selectedNode) {
+                        edge.updateControlPoint()
                     }
                 }
                 invalidate()
             }
         }
     }
+
 
     private fun handleTouchUp(x: Float, y: Float) {
         cancelPendingActions()
