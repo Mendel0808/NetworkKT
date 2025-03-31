@@ -25,9 +25,9 @@ class MainActivity : AppCompatActivity() {
         graph = Graph()
         graphView = findViewById(R.id.graphView)
         graphView.definirGraphe(graph)
-        val planAppartement = BitmapFactory.decodeResource(resources, R.drawable.plan)
+        val planAppartement = BitmapFactory.decodeResource(resources, R.drawable.plan_appartement)
         // Définir le plan d'appartement dans le GraphView
-        //graphView.PlanAppartement(planAppartement)  // à activer ici
+        graphView.PlanAppartement(planAppartement)  // à activer ici
 
     }
 
