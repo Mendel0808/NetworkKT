@@ -1,5 +1,6 @@
 package ci.miage.mob.networkkt
 //1
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -8,13 +9,12 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import ci.miage.mob.networkkt.models.Graph
-import ci.miage.mob.networkkt.models.Node
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var graph: Graph
     private lateinit var graphView: GraphView
-    private var dialog: AlertDialog? = null
+    private var dialogue: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,12 +24,16 @@ class MainActivity : AppCompatActivity() {
         // Initialisation du graphe
         graph = Graph()
         graphView = findViewById(R.id.graphView)
-        graphView.setGraph(graph)
+        graphView.definirGraphe(graph)
+        val planAppartement = BitmapFactory.decodeResource(resources, R.drawable.plan)
+        // Définir le plan d'appartement dans le GraphView
+        //graphView.PlanAppartement(planAppartement)  // à activer ici
+
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        dialog?.dismiss()
+        dialogue?.dismiss()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -40,33 +44,33 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_reset -> {
-                graph.nodes.clear()
-                graph.edges.clear()
+                graph.nœuds.clear()
+                graph.connexions.clear()
                 graphView.invalidate()
                 Toast.makeText(this, getString(R.string.toast_graphs_reset), Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.menu_save -> {
-                showSaveDialog()
+                afficherDialogueSauvegarde()
                 true
             }
             R.id.menu_load -> {
-                showLoadNetworkDialog()
+                afficherDialogueChargementReseau()
                 true
             }
             R.id.menu_add_object -> {
-                graphView.setAddObjectMode(true)
+                graphView.activerModeAjoutObjet(true)
                 Toast.makeText(this, getString(R.string.toast_add_object_mode), Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.menu_add_connection -> {
-                graphView.setAddConnectionMode(true)
+                graphView.activerModeAjoutConnexion(true)
                 Toast.makeText(this, getString(R.string.toast_add_connection_mode), Toast.LENGTH_SHORT).show()
                 true
             }
             R.id.menu_edit -> {
-                graphView.setAddObjectMode(false)
-                graphView.setAddConnectionMode(false)
+                graphView.activerModeAjoutObjet(false)
+                graphView.activerModeAjoutConnexion(false)
                 Toast.makeText(this, getString(R.string.toast_edit_mode), Toast.LENGTH_SHORT).show()
                 true
             }
@@ -74,16 +78,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showSaveDialog() {
-        val input = EditText(this)
-        dialog = AlertDialog.Builder(this)
+    private fun afficherDialogueSauvegarde() {
+        val saisie = EditText(this)
+        dialogue = AlertDialog.Builder(this)
             .setTitle(getString(R.string.menu_save))
-            .setView(input)
+            .setView(saisie)
             .setPositiveButton(getString(R.string.menu_save)) { _, _ ->
-                val filename = input.text.toString()
-                if (filename.isNotEmpty()) {
-                    val fullFilename = if (filename.endsWith(".json")) filename else "$filename.json"
-                    if (graph.saveToFile(this, fullFilename)) {
+                val nomFichier = saisie.text.toString()
+                if (nomFichier.isNotEmpty()) {
+                    val fullFilename = if (nomFichier.endsWith(".json")) nomFichier else "$nomFichier.json"
+                    if (graph.sauvegarderDansFichier(this, fullFilename)) {
                         Toast.makeText(
                             this,
                             getString(R.string.toast_network_saved, fullFilename),
@@ -98,30 +102,30 @@ class MainActivity : AppCompatActivity() {
             }
             .setNegativeButton(getString(R.string.cancel), null)
             .create()
-        dialog?.show()
+        dialogue?.show()
     }
 
-    private fun showLoadNetworkDialog() {
-        val networks = graph.listSavedNetworks(this)
-        if (networks.isEmpty()) {
+    private fun afficherDialogueChargementReseau() {
+        val reseaux = graph.listerFichiersSauvegardes(this)
+        if (reseaux.isEmpty()) {
             Toast.makeText(this, getString(R.string.toast_no_networks_saved), Toast.LENGTH_SHORT).show()
             return
         }
-        dialog = AlertDialog.Builder(this)
+        dialogue = AlertDialog.Builder(this)
             .setTitle(getString(R.string.menu_load))
-            .setItems(networks.toTypedArray()) { _, which ->
-                val filename = networks[which]
-                if (graph.loadFromFile(this, filename)) {
+            .setItems(reseaux.toTypedArray()) { _, which ->
+                val nomFichier = reseaux[which]
+                if (graph.chargerDepuisFichier(this, nomFichier)) {
                     graphView.invalidate()
                     Toast.makeText(
                         this,
-                        getString(R.string.toast_network_loaded, filename),
+                        getString(R.string.toast_network_loaded, nomFichier),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
             }
             .setNegativeButton(getString(R.string.cancel), null)
             .create()
-        dialog?.show()
+        dialogue?.show()
     }
 }

@@ -1,5 +1,5 @@
 package ci.miage.mob.networkkt.models
-//1
+
 import android.content.Context
 import android.graphics.Path
 import android.graphics.PathMeasure
@@ -10,167 +10,159 @@ import java.io.IOException
 import java.io.Serializable
 import kotlin.math.*
 
-
 class Graph : Serializable {
-    val nodes = mutableSetOf<Node>()
-    val edges = mutableSetOf<Edge>()
+    val nœuds = mutableSetOf<Noeud>()
+    val connexions = mutableSetOf<Connexion>()
 
-    fun addNode(node: Node) {
-        if (nodes.none { it.id == node.id }) {
-            nodes.add(node)
-            Log.d("Graph", "Nœud ajouté : ${node.label}.")
+    fun ajouterNœud(nœud: Noeud) {
+        if (nœuds.none { it.identifiant == nœud.identifiant }) {
+            nœuds.add(nœud)
+            Log.d("Graphe", "Nœud ajouté : ${nœud.etiquette}.")
         }
     }
 
-    fun removeNode(node: Node) {
-        if (nodes.contains(node)) {
-            nodes.remove(node)
-            edges.removeAll { it.start == node || it.end == node }
-            Log.d("Graph", "Nœud supprimé : ${node.label}.")
+    fun supprimerNœud(nœud: Noeud) {
+        if (nœuds.contains(nœud)) {
+            nœuds.remove(nœud)
+            connexions.removeAll { it.debut == nœud || it.fin == nœud }
+            Log.d("Graphe", "Nœud supprimé : ${nœud.etiquette}.")
         }
     }
 
-    fun addEdge(edge: Edge): Boolean {
-        Log.d("Graph", "Nœuds disponibles dans le graphe : ${nodes.joinToString { it.label }}")
+    fun ajouterConnexion(connexion: Connexion): Boolean {
+        Log.d("Graphe", "Nœuds disponibles dans le graphe : ${nœuds.joinToString { it.etiquette }}")
 
-        if (edge.start == edge.end) {
-            Log.d("Graph", "Arête non ajoutée : les nœuds de départ et d'arrivée sont identiques.")
+        if (connexion.debut == connexion.fin) {
+            Log.d("Graphe", "Connexion non ajoutée : les nœuds de départ et d'arrivée sont identiques.")
             return false
         }
-        if (!nodes.contains(edge.start) || !nodes.contains(edge.end)) {
-            Log.d("Graph", "Arête non ajoutée : un des nœuds n'existe pas dans le graphe.")
-            Log.d("Graph", "Nœud de départ : ${edge.start.label}, Nœud d'arrivée : ${edge.end.label}")
+        if (!nœuds.contains(connexion.debut) || !nœuds.contains(connexion.fin)) {
+            Log.d("Graphe", "Connexion non ajoutée : un des nœuds n'existe pas dans le graphe.")
+            Log.d("Graphe", "Nœud de départ : ${connexion.debut.etiquette}, Nœud d'arrivée : ${connexion.fin.etiquette}")
             return false
         }
-        if (edges.any { (it.start == edge.start && it.end == edge.end) || (it.start == edge.end && it.end == edge.start) }) {
-            Log.d("Graph", "Arête non ajoutée : une arête existe déjà entre ces nœuds.")
+        if (connexions.any { (it.debut == connexion.debut && it.fin == connexion.fin) || (it.debut == connexion.fin && it.fin == connexion.debut) }) {
+            Log.d("Graphe", "Connexion non ajoutée : une connexion existe déjà entre ces nœuds.")
             return false
         }
-        edges.add(edge)
-        Log.d("Graph", "Arête ajoutée entre ${edge.start.label} et ${edge.end.label}.")
+        connexions.add(connexion)
+        Log.d("Graphe", "Connexion ajoutée entre ${connexion.debut.etiquette} et ${connexion.fin.etiquette}.")
         return true
     }
 
-    fun removeEdge(edge: Edge) {
-        val removed = edges.remove(edge)
-        if (removed) {
-            Log.d("Graph", "Arête supprimée entre ${edge.start.label} et ${edge.end.label}.")
+    fun supprimerConnexion(connexion: Connexion) {
+        val supprimee = connexions.remove(connexion)
+        if (supprimee) {
+            Log.d("Graphe", "Connexion supprimée entre ${connexion.debut.etiquette} et ${connexion.fin.etiquette}.")
         } else {
-            Log.d("Graph", "Échec de la suppression de l'arête entre ${edge.start.label} et ${edge.end.label}.")
+            Log.d("Graphe", "Échec de la suppression de la connexion entre ${connexion.debut.etiquette} et ${connexion.fin.etiquette}.")
         }
     }
 
-    // Trouver un nœud à une position donnée
-    fun findNodeAt(x: Float, y: Float): Node? {
-        return nodes.find { it.isInside(x, y) }
+    fun trouverNœudA(x: Float, y: Float): Noeud? {
+        return nœuds.find { it.estDedans(x, y) }
     }
 
-    // Sauvegarder le graphe dans un fichier
-    fun saveToFile(context: Context, filename: String): Boolean {
+    fun sauvegarderDansFichier(contexte: Context, nomFichier: String): Boolean {
         return try {
-            val folder = File(context.filesDir, "saved_networks")
-            if (!folder.exists()) {
-                folder.mkdir()
+            val dossier = File(contexte.filesDir, "graphes_sauvegardés")
+            if (!dossier.exists()) {
+                dossier.mkdir()
             }
-            val file = File(folder, filename)
-            file.writeText(Gson().toJson(this))
-            Log.d("Graph", "Graphe sauvegardé dans ${file.absolutePath}.")
+            val fichier = File(dossier, nomFichier)
+            fichier.writeText(Gson().toJson(this))
+            Log.d("Graphe", "Graphe sauvegardé dans ${fichier.absolutePath}.")
             true
         } catch (e: IOException) {
-            Log.e("Graph", "Erreur lors de la sauvegarde du graphe", e)
+            Log.e("Graphe", "Erreur lors de la sauvegarde du graphe", e)
             false
         }
     }
 
-    // Charger un graphe depuis un fichier
-    fun loadFromFile(context: Context, filename: String): Boolean {
+    fun chargerDepuisFichier(contexte: Context, nomFichier: String): Boolean {
         return try {
-            val folder = File(context.filesDir, "saved_networks")
-            val file = File(folder, filename)
-            if (file.exists()) {
-                val json = file.readText()
-                val loadedGraph = Gson().fromJson(json, Graph::class.java)
+            val dossier = File(contexte.filesDir, "graphes_sauvegardés")
+            val fichier = File(dossier, nomFichier)
+            if (fichier.exists()) {
+                val json = fichier.readText()
+                val grapheCharge = Gson().fromJson(json, Graph::class.java)
 
-                // Réinitialiser les nœuds et arêtes actuels
-                nodes.clear()
-                edges.clear()
+                nœuds.clear()
+                connexions.clear()
+                nœuds.addAll(grapheCharge.nœuds)
 
-                // Ajouter les nœuds chargés
-                nodes.addAll(loadedGraph.nodes)
-
-                // Reconstruire les arêtes avec les bonnes références aux nœuds
-                for (edge in loadedGraph.edges) {
-                    val startNode = nodes.find { it.id == edge.start.id }
-                    val endNode = nodes.find { it.id == edge.end.id }
-                    if (startNode != null && endNode != null) {
-                        val newEdge = Edge(
-                            start = startNode,
-                            end = endNode,
-                            color = edge.color,
-                            thickness = edge.thickness,
-                            label = edge.label
+                // Reconstruire les connexions avec les bonnes références aux nœuds
+                for (connexion in grapheCharge.connexions) {
+                    val nœudDepart = nœuds.find { it.identifiant == connexion.debut.identifiant }
+                    val nœudArrivee = nœuds.find { it.identifiant == connexion.fin.identifiant }
+                    if (nœudDepart != null && nœudArrivee != null) {
+                        val nouvelleConnexion = Connexion(
+                            debut = nœudDepart,
+                            fin = nœudArrivee,
+                            couleur = connexion.couleur,
+                            epaisseur = connexion.epaisseur,
+                            etiquette = connexion.etiquette,
+                            pointDeControleX = connexion.pointDeControleX,
+                            pointDeControleY = connexion.pointDeControleY,
+                            estCourbe = connexion.estCourbe
                         )
-                        edges.add(newEdge)
+                        connexions.add(nouvelleConnexion)
                     }
                 }
 
-                Log.d("Graph", "Graphe chargé depuis ${file.absolutePath}.")
+                Log.d("Graphe", "Graphe chargé depuis ${fichier.absolutePath}.")
                 true
             } else {
-                Log.d("Graph", "Aucun fichier de graphe trouvé.")
+                Log.d("Graphe", "Aucun fichier de graphe trouvé.")
                 false
             }
         } catch (e: IOException) {
-            Log.e("Graph", "Erreur lors du chargement du graphe", e)
+            Log.e("Graphe", "Erreur lors du chargement du graphe", e)
             false
         }
     }
 
-    // Lister les fichiers sauvegardés
-    fun listSavedNetworks(context: Context): List<String> {
-        val folder = File(context.filesDir, "saved_networks")
-        return if (folder.exists() && folder.isDirectory) {
-            folder.listFiles()?.map { it.name } ?: emptyList()
+    fun listerFichiersSauvegardes(contexte: Context): List<String> {
+        val dossier = File(contexte.filesDir, "graphes_sauvegardés")
+        return if (dossier.exists() && dossier.isDirectory) {
+            dossier.listFiles()?.map { it.name } ?: emptyList()
         } else {
             emptyList()
         }
     }
 
+    fun trouverConnexionA(x: Float, y: Float): Connexion? {
+        return connexions.find { connexion ->
+            val (positionEtiquetteX, positionÉtiquetteY) = connexion.obtenirPositionEtiquette()
+            val estPrèsDeLÉtiquette = connexion.etiquette != null &&
+                    sqrt((x - positionEtiquetteX).pow(2) + (y - positionÉtiquetteY).pow(2)) <= 50f
 
-    fun findEdgeAt(x: Float, y: Float): Edge? {
-        return edges.find { edge ->
-            val (labelX, labelY) = edge.getLabelPosition()
-            val isNearLabel = edge.label != null &&
-                    sqrt((x - labelX).pow(2) + (y - labelY).pow(2)) <= 50f
-
-            isNearLabel || isPointNearEdge(x, y, edge)
+            estPrèsDeLÉtiquette || estPointPrèsDeLaConnexion(x, y, connexion)
         }
     }
 
-    private fun isPointNearEdge(px: Float, py: Float, edge: Edge): Boolean {
-        return if (edge.isCurved) isPointNearCurve(px, py, edge)
-        else isPointNearLine(px, py, edge.start.x, edge.start.y, edge.end.x, edge.end.y, 20f)
+    private fun estPointPrèsDeLaConnexion(px: Float, py: Float, connexion: Connexion): Boolean {
+        return if (connexion.estCourbe) estPointPrèsDeLaCourbe(px, py, connexion)
+        else estPointPresDeLaLigne(px, py, connexion.debut.coordX, connexion.debut.coordY, connexion.fin.coordX, connexion.fin.coordY, 20f)
     }
 
-    private fun isPointNearCurve(px: Float, py: Float, edge: Edge): Boolean {
-        val path = Path().apply {
-            moveTo(edge.start.x, edge.start.y)
-            quadTo(edge.controlX, edge.controlY, edge.end.x, edge.end.y)
+    private fun estPointPrèsDeLaCourbe(px: Float, py: Float, connexion: Connexion): Boolean {
+        val chemin = Path().apply {
+            moveTo(connexion.debut.coordX, connexion.debut.coordY)
+            quadTo(connexion.pointDeControleX, connexion.pointDeControleY, connexion.fin.coordX, connexion.fin.coordY)
         }
-        val measure = PathMeasure(path, false)
+        val mesure = PathMeasure(chemin, false)
         val point = FloatArray(2)
         for (i in 0..10) {
-            measure.getPosTan(i * measure.length / 10, point, null)
+            mesure.getPosTan(i * mesure.length / 10, point, null)
             if (sqrt((px - point[0]).pow(2) + (py - point[1]).pow(2)) <= 20f) return true
         }
         return false
     }
 
-
-    private fun isPointNearLine(px: Float, py: Float, x1: Float, y1: Float,
-                                x2: Float, y2: Float, tolerance: Float): Boolean {
-        val lineLength = sqrt((x2 - x1).pow(2) + (y2 - y1).pow(2))
-        val distance = abs((y2 - y1) * px - (x2 - x1) * py + x2 * y1 - y2 * x1) / lineLength
-        return distance <= tolerance
+    private fun estPointPresDeLaLigne(px: Float, py: Float, x1: Float, y1: Float, x2: Float, y2: Float, tolérance: Float): Boolean {
+        val longueurLigne = sqrt((x2 - x1).pow(2) + (y2 - y1).pow(2))
+        val distance = abs((y2 - y1) * px - (x2 - x1) * py + x2 * y1 - y2 * x1) / longueurLigne
+        return distance <= tolérance
     }
 }
