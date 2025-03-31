@@ -110,7 +110,7 @@ class GraphView @JvmOverloads constructor(
             canvas.save()
             canvas.scale(scaledWidth / imageWidth, scaledHeight / imageHeight)
             canvas.translate(left, top)
-            canvas.drawBitmap(bitmap, 50f, 0f, null)
+            canvas.drawBitmap(bitmap, -50f, 0f, null)
             canvas.restore()
         }
 
